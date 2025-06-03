@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import PalettePreview from "@/components/PalettePreview";
 // import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -8,6 +9,7 @@ export default function Home() {
       <Header />
       <main className="flex-1 flex flex-col items-center justify-center">
         <Hero />
+        <PalettePreview />
       </main>
       {/* <Footer /> */}
     </div>
