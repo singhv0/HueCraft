@@ -58,3 +58,19 @@ body {
 .animate-bar3 { animation: bar3 1s 0.2s ease-in-out infinite; }
 .animate-bar4 { animation: bar4 1s 0.3s ease-in-out infinite; }
 .animate-bar5 { animation: bar5 1s 0.4s ease-in-out infinite; }
+
+@keyframes white-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255,255,255,0);
+  }
+  50% {
+    box-shadow: 0 0 24px 8px rgba(255,255,255,0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255,255,255,0);
+  }
+}
+
+.glow-animate {
+  animation: white-glow 0.7s ease-in-out;
+}

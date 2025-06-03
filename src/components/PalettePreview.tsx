@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy } from "lucide-react";
+import { Copy, Stars } from "lucide-react";
 
 const DEFAULT_COLORS = [
   "#ffbe0b", // amber
@@ -15,6 +15,7 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
   const [palette, setPalette] = useState(colors);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [popupPos, setPopupPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [generateHovered, setGenerateHovered] = useState(false);
 
   const handleGenerate = () => {
     setPalette([...palette].sort(() => Math.random() - 0.5));
@@ -22,98 +23,144 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
 
   return (
     <aside className="fixed top-32 right-4 md:right-16 flex flex-col items-end z-30">
-      <div className="flex flex-row mb-10">
-        {palette.map((color, idx) => {
-          const rgb = hexToRgb(color);
-          const hsl = rgbToHsl(rgb);
-          const hsv = rgbToHsv(rgb);
-          const cmyk = rgbToCmyk(rgb);
+      {/* Wrap bars in a div */}
+      <div>
+        <div className="flex flex-row mb-10">
+          {palette.map((color, idx) => {
+            const rgb = hexToRgb(color);
+            const hsl = rgbToHsl(rgb);
+            const hsv = rgbToHsv(rgb);
+            const cmyk = rgbToCmyk(rgb);
 
-          // Track copy state for feedback (optional)
-          const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+            // Track copy state for feedback (optional)
+            const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
-          const handleCopy = async (color: string, idx: number) => {
-            try {
-              await navigator.clipboard.writeText(color.toUpperCase());
-              setCopiedIdx(idx);
-              setTimeout(() => setCopiedIdx(null), 1000);
-            } catch {}
-          };
+            const handleCopy = async (color: string, idx: number) => {
+              try {
+                await navigator.clipboard.writeText(color.toUpperCase());
+                setCopiedIdx(idx);
+                setTimeout(() => setCopiedIdx(null), 1000);
+              } catch {}
+            };
 
-          return (
-            <div
-              key={color + idx}
-              className="flex flex-col items-center relative group"
-              onMouseEnter={e => {
-                setHoveredIdx(idx);
-                setPopupPos({ x: e.clientX + 24, y: e.clientY - 40 });
-              }}
-              onMouseLeave={() => setHoveredIdx(null)}
-              onMouseMove={() => {}}
-            >
-              <button
-                className={`h-92 rounded-3xl shadow-xl transition-all duration-300 relative flex items-center justify-center outline-none
-    w-32 ${hoveredIdx === idx ? "scale-105 w-40 z-10 shadow-gray-800/80" : ""}
-  `}
-                style={{ background: color }}
-                title={color}
-                tabIndex={0}
-                onClick={() => handleCopy(color, idx)}
+            return (
+              <div
+                key={color + idx}
+                className="flex flex-col items-center relative group"
+                onMouseEnter={e => {
+                  setHoveredIdx(idx);
+                  setPopupPos({ x: e.clientX + 24, y: e.clientY - 40 });
+                }}
+                onMouseLeave={() => setHoveredIdx(null)}
+                onMouseMove={() => {}}
               >
-                {/* Copy icon appears on hover, now on the left */}
-                <span
-                  className={`
-      absolute left-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-2
-      ${hoveredIdx === idx ? "opacity-100" : ""}
-    `}
+                <button
+                  className={`h-92 rounded-3xl shadow-xl transition-all duration-300 relative flex items-center justify-center outline-none
+    w-32 ${hoveredIdx === idx ? "scale-105 w-40 z-10 shadow-gray-800/80" : ""}
+    ${copiedIdx === idx ? "ring-4 ring-white ring-opacity-80 animate-glow" : ""}
+  `}
+                  style={{ background: color }}
+                  title={color}
+                  tabIndex={0}
+                  onClick={() => handleCopy(color, idx)}
                 >
-                  {copiedIdx === idx ? (
-                    <span className="text-xs text-white px-2">Copied!</span>
-                  ) : (
-                    <Copy size={18} className="text-white" />
-                  )}
-                </span>
-                {/* HEX code centered on the bar */}
-                <span
-                  className={`
+                  {/* Copy icon appears on hover, now on the left */}
+                  <span
+                    className={`
+    absolute left-2 top-2 transition-opacity p-2
+    ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
+    pointer-events-none
+  `}
+                  >
+                    <span className="relative block w-6 h-6">
+                      <Copy
+                        size={18}
+                        className={`text-white absolute inset-0 transition-transform duration-300
+        ${copiedIdx === idx ? "scale-0 rotate-45 opacity-0" : "scale-100 opacity-100"}
+      `}
+                      />
+                      {/* Animated checkmark */}
+                      <svg
+                        className={`
+        absolute inset-0 w-6 h-6 text-white transition-all duration-300
+        ${copiedIdx === idx ? "opacity-100 scale-100" : "opacity-0 scale-50"}
+      `}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                  </span>
+                  {/* HEX code centered on the bar */}
+                  <span
+                    className={`
     absolute inset-0 flex items-center justify-center font-lexend text-white text-sm font-light drop-shadow
     transition-opacity duration-200
     ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
   `}
-                  style={{ pointerEvents: "none" }}
-                >
-                  {color.toUpperCase()}
-                </span>
-              </button>
-              {hoveredIdx === idx && (
-                <div
-                  className="fixed flex flex-col items-center gap-2 bg-black/95 backdrop-blur-md rounded-4xl shadow-lg px-10 py-6 z-50 animate-fade-in transition-all duration-300"
-                  style={{
-                    left: popupPos.x,
-                    top: popupPos.y,
-                    minWidth: '15.5rem',
-                    pointerEvents: 'none',
-                  }}
-                >
-                  <span className="text-white text-sm font-lexend font-semibold mb-1">Color Details</span>
-                  <div className="text-xs text-white font-lexend text-left select-all space-y-3">
-                    <div>HEX: {color.toUpperCase()}</div>
-                    <div>RGB: {`rgb(${rgb.join(", ")})`}</div>
-                    <div>CMYK: {`cmyk(${cmyk.join(", ")})`}</div>
-                    <div>HSV: {`hsv(${hsv.join(", ")})`}</div>
-                    <div>HSL: {`hsl(${hsl.join(", ")})`}</div>
+                  >
+                    {color.toUpperCase()}
+                  </span>
+                </button>
+                {/* Color details window below the bar */}
+                {hoveredIdx === idx && (
+                  <div
+                    className="absolute left-1/2 -translate-x-1/2 top-full mt-3 -translate-y-16 flex flex-col items-center gap-2 bg-black backdrop-blur-md rounded-4xl shadow-lg px-10 py-6 z-50 animate-fade-in transition-all duration-300"
+                    style={{
+                      minWidth: '15.5rem',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {/* <span className="text-white text-sm font-lexend font-semibold mb-1">Color Details</span> */}
+                    <div className="text-xs text-white font-lexend text-left select-all space-y-3 ml-2">
+                      <div>HEX: {color.toUpperCase()}</div>
+                      <div>RGB: {`rgb(${rgb.join(", ")})`}</div>
+                      <div>CMYK: {`cmyk(${cmyk.join(", ")})`}</div>
+                      <div>HSV: {`hsv(${hsv.join(", ")})`}</div>
+                      <div>HSL: {`hsl(${hsl.join(", ")})`}</div>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
       <button
         onClick={handleGenerate}
-        className="px-6 py-2 rounded-2xl font-light bg-black text-white hover:bg-gray-800 transition"
+        className={`
+          px-6 py-2 rounded-2xl font-light bg-black text-white transition-all duration-300
+          flex items-center justify-center gap-2 relative overflow-hidden
+          ${generateHovered ? "scale-105 shadow-lg w-40" : "w-32"}
+        `}
+        onMouseEnter={() => setGenerateHovered(true)}
+        onMouseLeave={() => setGenerateHovered(false)}
       >
-        Generate
+        {/* Left star */}
+        <span
+          className={`
+            absolute left-5 top-1/2 -translate-y-1/2 transition-all duration-300
+            ${generateHovered ? "opacity-100 -translate-x-1" : "opacity-0 translate-x-0"}
+          `}
+        >
+          <Stars size={18} className="text-white drop-shadow" />
+        </span>
+        {/* Generate text */}
+        <span className="relative z-10 transition-all duration-300">
+          Generate
+        </span>
+        {/* Right star */}
+        <span
+          className={`
+            absolute right-5 top-1/2 -translate-y-1/2 transition-all duration-300
+            ${generateHovered ? "opacity-100 translate-x-1" : "opacity-0 translate-x-0"}
+          `}
+        >
+          <Stars size={18} className="text-white drop-shadow" />
+        </span>
       </button>
     </aside>
   );
