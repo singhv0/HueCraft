@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   const [hovered, setHovered] = useState(false);
@@ -22,9 +23,10 @@ export default function Hero() {
             transition-all duration-450
             outline-none
             overflow-hidden
+            flex items-center justify-center
             ${hovered 
-              ? "bg-gradient-to-r from-[#ffbe0b] via-[#fb5607] via-[#ff006e] via-[#8338ec] to-[#3a86ff] animate-gradient-move saturate-150 scale-110"
-              : "bg-black"
+              ? "bg-gradient-to-r from-[#ffbe0b] via-[#fb5607] via-[#ff006e] via-[#8338ec] to-[#3a86ff] animate-gradient-move saturate-150 scale-100 w-45"
+              : "bg-black w-40"
             }
           `}
           style={{
@@ -32,7 +34,20 @@ export default function Hero() {
             backgroundPosition: hovered ? "right center" : undefined,
           }}
         >
-          Explore
+          {/* Centered Explore text */}
+          <span className="relative z-10 w-full text-center transition-all duration-300">
+            Explore
+          </span>
+          {/* Animated Arrow appears only on hover, slides in from center to right */}
+          <span
+            className={`
+              absolute right-4 top-1/2 -translate-y-1/2 transition-all duration-300
+              ${hovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}
+              flex items-center
+            `}
+          >
+            <ArrowRight size={22} className="text-white" />
+          </span>
         </button>
         {hovered && (
           <div className="absolute left-full top-1/2 -translate-y-1/2 ml-6 flex flex-col items-center gap-3 bg-white/0 backdrop-blur-md border border-gray-400 rounded-2xl shadow-lg px-8 py-6 z-20 animate-fade-in">
@@ -47,7 +62,7 @@ export default function Hero() {
           </div>
         )}
       </div>
-      <p className="text-sm text-black max-w-md mt-24">
+      <p className="text-sm text-black max-w-md mt-20">
         Design your vibe with hues that inspire and palettes that impress.
       </p>
     </section>

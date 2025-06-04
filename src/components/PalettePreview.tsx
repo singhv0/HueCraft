@@ -22,7 +22,7 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
   };
 
   return (
-    <aside className="fixed top-32 right-4 md:right-16 flex flex-col items-end z-30">
+    <aside className="relative z-30">
       {/* Wrap bars in a div */}
       <div>
         <div className="flex flex-row mb-10">
