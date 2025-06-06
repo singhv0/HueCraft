@@ -23,9 +23,15 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
 
   return (
     <aside className="relative z-30">
-      {/* Wrap bars in a div */}
       <div>
-        <div className="flex flex-row mb-10">
+        <div
+          className="flex flex-row mb-10 mx-auto rounded-3xl bg-gray-100"
+          style={{
+            height: "21rem",
+            width: "50rem",
+            boxShadow: "0px 0px 0px 0px rgba(0,0,0,0.2)" // right & down
+          }}
+        >
           {palette.map((color, idx) => {
             const rgb = hexToRgb(color);
             const hsl = rgbToHsl(rgb);
@@ -43,22 +49,39 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
               } catch {}
             };
 
+            // Determine border radius
+            let rounded = "";
+            if (idx === 0) rounded = "rounded-l-3xl";
+            else if (idx === palette.length - 1) rounded = "rounded-r-3xl";
+
             return (
               <div
                 key={color + idx}
-                className="flex flex-col items-center relative group"
+                className={`
+                  group relative transition-all duration-300
+                  ${rounded}
+                  ${hoveredIdx === idx ? "z-10" : ""}
+                  flex-1
+                `}
+                style={{
+                  flexGrow: hoveredIdx === idx ? 2 : 1,
+                  transition: "flex-grow 0.3s cubic-bezier(.4,2,.6,1), z-index 0s",
+                  height: "100%",
+                }}
                 onMouseEnter={e => {
                   setHoveredIdx(idx);
                   setPopupPos({ x: e.clientX + 24, y: e.clientY - 40 });
                 }}
                 onMouseLeave={() => setHoveredIdx(null)}
-                onMouseMove={() => {}}
               >
                 <button
-                  className={`h-92 rounded-3xl shadow-xl transition-all duration-300 relative flex items-center justify-center outline-none
-    w-32 ${hoveredIdx === idx ? "scale-105 w-40 z-10 shadow-gray-800/80" : ""}
-    ${copiedIdx === idx ? "ring-4 ring-white ring-opacity-80 animate-glow" : ""}
-  `}
+                  className={`
+                  h-full w-full transition-all duration-300
+                  ${rounded}
+                  shadow-none
+                  relative flex items-center justify-center outline-none
+                  ${copiedIdx === idx ? "ring-4 ring-white ring-opacity-80 animate-glow" : ""}
+                `}
                   style={{ background: color }}
                   title={color}
                   tabIndex={0}

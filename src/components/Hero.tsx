@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Hero() {
   const [hovered, setHovered] = useState(false);
+  const router = useRouter();
 
   return (
     <section className="w-full py-2 mt-8 flex flex-col items-start text-left">
@@ -23,7 +25,7 @@ export default function Hero() {
             transition-all duration-450
             outline-none
             overflow-hidden
-            flex items-center justify-center
+            flex items-center justify-center  
             ${hovered 
               ? "bg-gradient-to-r from-[#ffbe0b] via-[#fb5607] via-[#ff006e] via-[#8338ec] to-[#3a86ff] animate-gradient-move saturate-150 scale-100 w-45"
               : "bg-black w-40"
@@ -33,6 +35,7 @@ export default function Hero() {
             backgroundSize: hovered ? "200% 200%" : undefined,
             backgroundPosition: hovered ? "right center" : undefined,
           }}
+          onClick={() => router.push("/gallery")}
         >
           {/* Centered Explore text */}
           <span className="relative z-10 w-full text-center transition-all duration-300">
