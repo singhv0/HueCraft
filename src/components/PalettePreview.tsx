@@ -60,7 +60,7 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
                 className={`
                   group relative transition-all duration-300
                   ${rounded}
-                  ${hoveredIdx === idx ? "z-10" : ""}
+                  ${hoveredIdx === idx ? "z-15" : ""}
                   flex-1
                 `}
                 style={{
@@ -131,7 +131,7 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
                 {/* Color details window below the bar */}
                 {hoveredIdx === idx && (
                   <div
-                    className="absolute left-1/2 -translate-x-1/2 top-full mt-3 -translate-y-16 flex flex-col items-center gap-2 bg-black backdrop-blur-md rounded-4xl shadow-lg px-10 py-6 z-50 animate-fade-in transition-all duration-300"
+                    className="absolute left-1/2 -translate-x-1/2 top-full mt-3 -translate-y-16 flex flex-col items-center gap-2 bg-black backdrop-blur-md rounded-4xl shadow-lg px-10 py-6 z-[100] animate-fade-in transition-all duration-300"
                     style={{
                       minWidth: '15.5rem',
                       pointerEvents: 'none',
