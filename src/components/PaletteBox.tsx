@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
-import { Copy, MoreHorizontal } from "lucide-react";
+import { Copy, MoreHorizontal, Bookmark } from "lucide-react";
 
 export default function PaletteBox({ colors, height = "4rem" }: { colors: string[], height?: string }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [copiedTailwind, setCopiedTailwind] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarkPopping, setBookmarkPopping] = useState(false);
 
   const handleCopy = async (color: string, idx: number) => {
     try {
@@ -25,8 +27,14 @@ export default function PaletteBox({ colors, height = "4rem" }: { colors: string
     } catch {}
   };
 
+  const handleBookmarkClick = () => {
+    setBookmarked(b => !b);
+    setBookmarkPopping(true);
+    setTimeout(() => setBookmarkPopping(false), 350); // match duration-300
+  };
+
   return (
-    <div className="relative w-full" style={{ minHeight: height }}>
+    <div className="relative w-full flex flex-col items-center" style={{ minHeight: height }}>
       <div
         className="flex flex-row w-full rounded-3xl bg-gray-100"
         style={{
@@ -112,19 +120,50 @@ export default function PaletteBox({ colors, height = "4rem" }: { colors: string
           );
         })}
       </div>
-      {/* 3-dot icon in lower right, outside palette box */}
-      <button
-        className="fixed md:absolute bottom-4 right-4 bg-white/80 hover:bg-white shadow rounded-full p-2 transition z-40"
-        title="Copy Tailwind CSS classes"
-        onClick={handleCopyTailwind}
-        style={{ pointerEvents: "auto" }}
-      >
-        <MoreHorizontal size={12} className="text-gray-700" />
-      </button>
+      {/* Icon bar below the palette box */}
+      <div className="flex flex-row items-center justify-end gap-2 mt-2 w-full px-2">
+        {/* Bookmark icon (now in place of heart, to the left of 3 dots) */}
+        <button
+          className="transition"
+          title="Bookmark"
+          style={{
+            pointerEvents: "auto",
+            background: "none",
+            border: "none",
+            boxShadow: "none",
+            padding: 0,
+          }}
+          onClick={handleBookmarkClick}
+        >
+          <Bookmark
+            size={16}
+            fill={bookmarked ? "#000" : "none"}
+            strokeWidth={2.2}
+            className={`
+              transition-all
+              duration-300
+              ${bookmarked ? "text-black" : "text-black"}
+              ${bookmarkPopping ? "scale-125" : "scale-100"}
+            `}
+            style={{
+              transitionTimingFunction: "cubic-bezier(.4,2,.6,1)",
+            }}
+          />
+        </button>
+        {/* 3 dots icon on the right */}
+        <button
+          className="transition"
+          title="Copy Tailwind CSS classes"
+          onClick={handleCopyTailwind}
+          style={{ pointerEvents: "auto", background: "none", border: "none", boxShadow: "none", padding: 0 }}
+        >
+          <MoreHorizontal size={22} className="text-black" />
+        </button>
+      </div>
       {/* Feedback */}
       {copiedTailwind && (
-        <span className="fixed md:absolute bottom-16 right-4 bg-black text-white text-xs rounded px-2 py-1 z-50">
-          Copied!
+        <span className="absolute bottom-0 right-69 text-zinc-500 text-xs px-4 py-1 z-50 fade-in-out">
+          Tailwindcss Copied!
         </span>
       )}
     </div>

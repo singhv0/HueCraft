@@ -30,7 +30,7 @@ export default function GalleryPage() {
 					{categories.map((category) => (
 						<button
 							key={category}
-							className={`px-5 py-2 rounded-2xl font-medium transition
+							className={`px-5 py-2 rounded-2xl text-sm font-medium transition
                 ${
 					activeCategory === category
 						? "bg-black text-white"
@@ -59,7 +59,7 @@ export default function GalleryPage() {
 									{section.category}
 								</h2>
 							)}
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 								{section.palettes.map((palette, i) => (
 									<motion.div
 										key={i}

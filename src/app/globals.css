@@ -74,3 +74,14 @@ body {
 .glow-animate {
   animation: white-glow 0.7s ease-in-out;
 }
+
+@keyframes fade-in-out {
+  0% { opacity: 0; transform: translateY(8px);}
+  10% { opacity: 1; transform: translateY(0);}
+  90% { opacity: 1; transform: translateY(0);}
+  100% { opacity: 0; transform: translateY(8px);}
+}
+
+.fade-in-out {
+  animation: fade-in-out 1.2s cubic-bezier(.4,2,.6,1);
+}
