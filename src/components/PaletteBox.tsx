@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Copy, MoreHorizontal, Bookmark, LayoutPanelLeft, Pencil, Eye } from "lucide-react";
+import { Copy, MoreHorizontal, Bookmark, LayoutPanelLeft, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function PaletteBox({
   colors,
@@ -9,9 +10,9 @@ export default function PaletteBox({
   showLayoutPanelLeft = true,
   isShowcaseOpen = false,
   isActive = false,
-  textColor, // <-- add this prop
-  onEdit, // <-- add this prop
-  onView, // <-- add this prop
+  textColor,
+  onEdit,
+  onView,
 }: {
   colors: string[];
   height?: string;
@@ -20,9 +21,10 @@ export default function PaletteBox({
   isShowcaseOpen?: boolean;
   isActive?: boolean;
   textColor?: "black";
-  onEdit?: () => void; // <-- add this prop type
+  onEdit?: () => void;
   onView?: () => void;
 }) {
+  const router = useRouter();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [copiedTailwind, setCopiedTailwind] = useState(false);
@@ -64,6 +66,10 @@ export default function PaletteBox({
     }
     setLayoutPopping(true);
     setTimeout(() => setLayoutPopping(false), 350);
+  };
+
+  const handleEditClick = () => {
+    router.push(`/palette-edit?colors=${colors.join(",")}`);
   };
 
   // Use black or white for text and icons
@@ -162,10 +168,10 @@ export default function PaletteBox({
           );
         })}
       </div>
-      {/* Icon bar below the palette box */}
-      <div className="flex flex-row items-center justify-between gap-2 mt-2 w-full px-2">
-        {/* Layout panel icon on the left */}
-        {showLayoutPanelLeft && (
+      {/* Icon bar below the palette box (now only rendered if showLayoutPanelLeft is true) */}
+      {showLayoutPanelLeft && (
+        <div className="flex flex-row items-center justify-center gap-4 mt-2 w-full px-2">
+          {/* Showcase icon */}
           <button
             className="p-2 rounded-xl transition"
             onClick={handleLayoutClick}
@@ -187,77 +193,43 @@ export default function PaletteBox({
               }}
             />
           </button>
-        )}
-        <div className="flex flex-row items-center gap-2 ml-auto">
           {/* Bookmark icon */}
           <button
-            className="transition"
-            title="Bookmark"
-            style={{
-              pointerEvents: "auto",
-              background: "none",
-              border: "none",
-              boxShadow: "none",
-              padding: 0,
+            className={`transition hover:bg-gray-100 rounded-full p-1.5 ${bookmarked ? "bg-gray-200" : ""}`}
+            title="Bookmark Palette"
+            onClick={() => {
+              setBookmarked((b) => !b);
+              setBookmarkPopping(true);
+              setTimeout(() => setBookmarkPopping(false), 350);
             }}
-            onClick={handleBookmarkClick}
           >
             <Bookmark
-              size={16}
+              size={18}
+              className={`text-black transition-all duration-300 ${bookmarked ? "scale-125" : "scale-100"}`}
               fill={bookmarked ? "#000" : "none"}
-              strokeWidth={2.2}
-              className={`
-                transition-all
-                duration-300
-                ${bookmarked ? "text-black" : "text-black"}
-                ${bookmarkPopping ? "scale-125" : "scale-100"}
-              `}
-              style={{
-                transitionTimingFunction: "cubic-bezier(.4,2,.6,1)",
-              }}
+              style={{ transitionTimingFunction: "cubic-bezier(.4,2,.6,1)" }}
             />
           </button>
-          {/* 3 dots icon on the right */}
+          {/* Edit (pencil) icon */}
+          {onEdit && (
+            <button
+              className="transition hover:bg-gray-100 rounded-full p-1.5"
+              title="Edit Palette"
+              onClick={handleEditClick}
+            >
+              <Pencil size={18} className="text-black" />
+            </button>
+          )}
+          {/* 3-dot icon */}
           <button
-            className="transition"
+            className="transition hover:bg-gray-100 rounded-full p-1.5"
             title="Copy Tailwind CSS classes"
             onClick={handleCopyTailwind}
-            style={{ pointerEvents: "auto", background: "none", border: "none", boxShadow: "none", padding: 0 }}
           >
-            <MoreHorizontal size={22} className="text-black" />
-          </button>
-          {/* Pencil icon for edit */}
-          <button
-            className="transition"
-            title="Edit Palette"
-            style={{
-              pointerEvents: "auto",
-              background: "none",
-              border: "none",
-              boxShadow: "none",
-              padding: 0,
-            }}
-            onClick={onEdit}
-          >
-            <Pencil size={18} className="text-black" />
-          </button>
-          {/* Eye icon for view */}
-          <button
-            className="transition"
-            title="View Palette Details"
-            style={{
-              pointerEvents: "auto",
-              background: "none",
-              border: "none",
-              boxShadow: "none",
-              padding: 0,
-            }}
-            onClick={onView}
-          >
-            <Eye size={18} className="text-black" />
+            <MoreHorizontal size={18} className="text-black" />
           </button>
         </div>
-      </div>
+      )}
       {/* Feedback */}
       {copiedTailwind && (
         <span className="absolute bottom-0 right-69 text-zinc-500 text-xs px-4 py-1 z-50 fade-in-out">

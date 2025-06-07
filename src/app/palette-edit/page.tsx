@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import PaletteBox from "@/components/PaletteBox";
 import { CATEGORIZED_PALETTES } from "@/data/categorized-palettes";
-import { Stars, Eye } from "lucide-react";
+import { Stars, Eye, Bookmark, MoreHorizontal } from "lucide-react";
 import { Dialog } from "@headlessui/react";
 
 export default function PaletteEditPage() {
@@ -16,6 +16,9 @@ export default function PaletteEditPage() {
   const [palette, setPalette] = useState<string[]>(initialColors);
   const [generateHovered, setGenerateHovered] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [copiedTailwind, setCopiedTailwind] = useState(false);
+  const [bookmarkPopping, setBookmarkPopping] = useState(false);
 
   // Generate a random palette from all palettes
   const handleGenerate = () => {
@@ -27,13 +30,57 @@ export default function PaletteEditPage() {
   return (
     <div className="flex flex-col min-h-screen px-4 md:px-16 bg-gray-50">
       <Header />
-      <main className="flex-1 flex flex-col items-center justify-center py-12">
+      <main className="flex-0 flex flex-col items-center justify-center h-full">
         <div className="w-full max-w-8xl flex flex-col items-center">
+          {/* Horizontal bar with centered icons */}
+          <div className="w-full max-w-xl flex justify-center mb-4">
+            <div className="bg-gray-200 rounded-2xl flex flex-row items-center justify-center gap-2 px-6 py-2 w-full">
+              {/* Eye icon for view */}
+              <button
+                className="transition hover:bg-gray-100 rounded-full p-1.5"
+                title="View Palette Details"
+                onClick={() => setDialogOpen(true)}
+              >
+                <Eye size={18} className="text-black" />
+              </button>
+              {/* Bookmark icon */}
+              <button
+                className={`transition hover:bg-gray-100 rounded-full p-1.5 ${bookmarked ? "bg-gray-200" : ""}`}
+                title="Bookmark Palette"
+                onClick={() => {
+                  setBookmarked((b) => !b);
+                  setBookmarkPopping(true);
+                  setTimeout(() => setBookmarkPopping(false), 350);
+                }}
+              >
+                <Bookmark
+                  size={18}
+                  className={`text-black transition-all duration-300 ${bookmarked ? "scale-125" : "scale-100"}`}
+                  fill={bookmarked ? "#000" : "none"}
+                  style={{ transitionTimingFunction: "cubic-bezier(.4,2,.6,1)" }}
+                />
+              </button>
+              {/* 3-dot icon */}
+              <button
+                className="transition hover:bg-gray-100 rounded-full p-1.5"
+                title="Copy Tailwind CSS classes"
+                onClick={async () => {
+                  const tailwind = palette.map((c) => `bg-[${c}]`).join(" ");
+                  try {
+                    await navigator.clipboard.writeText(tailwind);
+                    setCopiedTailwind(true);
+                    setTimeout(() => setCopiedTailwind(false), 1200);
+                  } catch {}
+                }}
+              >
+                <MoreHorizontal size={18} className="text-black" />
+              </button>
+            </div>
+          </div>
           <PaletteBox
             colors={palette}
-            height="20rem" // <-- Increase or decrease this value
+            height="24rem"
             showLayoutPanelLeft={false}
-            onView={() => setDialogOpen(true)}
           />
           <button
             onClick={handleGenerate}
@@ -70,7 +117,7 @@ export default function PaletteEditPage() {
         {/* Dialog for color details */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} className="fixed z-50 inset-0 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
-          <Dialog.Panel className="relative bg-white rounded-4xl shadow-xl p-8 max-w-lg w-full z-50">
+          <Dialog.Panel className="relative bg-white rounded-4xl shadow-xl p-6 max-w-lg w-full z-50">
             <div className="flex flex-col gap-6">
               {palette.map((color, idx) => {
                 // Convert to RGB/HSL

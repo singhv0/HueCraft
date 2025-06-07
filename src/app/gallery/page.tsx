@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LayoutPanelLeft } from "lucide-react";
 import PaletteBox from "@/components/PaletteBox";
 import Header from "@/components/Header";
 import PaletteShowcase from "@/components/PaletteShowcase";
 import { CATEGORIZED_PALETTES } from "@/data/categorized-palettes";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function GalleryPage() {
 	const [activeCategory, setActiveCategory] = useState<string>("All");
@@ -16,6 +16,15 @@ export default function GalleryPage() {
 	);
 	const [showShowcase, setShowShowcase] = useState(false);
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const colorsParam = searchParams.get("colors");
+	const [palette, setPalette] = useState<string[]>([]);
+
+	useEffect(() => {
+		if (colorsParam) {
+			setPalette(colorsParam.split(","));
+		}
+	}, [colorsParam]);
 
 	const categories = ["All", ...CATEGORIZED_PALETTES.map((c) => c.category)];
 	const filteredSections =
@@ -111,10 +120,7 @@ export default function GalleryPage() {
 														isShowcaseOpen={showShowcase}
 														isActive={isActive}
 														textColor={isMentalWellness ? "black" : undefined}
-														onEdit={() => {
-															// Pass palette as comma-separated hex in query
-															router.push(`/palette-edit?colors=${palette.join(",")}`);
-														}}
+														onEdit={() => router.push(`/palette-edit?colors=${palette.join(",")}`)}
 													/>
 												</motion.div>
 											);
@@ -124,6 +130,7 @@ export default function GalleryPage() {
 							);
 						})}
 					</AnimatePresence>
+					
 				</div>
 			</main>
 		</div>
