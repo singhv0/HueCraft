@@ -96,4 +96,80 @@ export const CATEGORIZED_PALETTES = [
             ["#22223B", "#4A4E69", "#9A8C98", "#C9ADA7", "#F2E9E4"],
         ],
     },
+    // Add new categories below
+    {
+        category: "Cinematic / Movie LUTs",
+        palettes: [
+            ["#1F2C34", "#2A3B47", "#3E4E5B", "#7A8C98", "#AAB6C1"],
+            ["#FF007F", "#FF00FF", "#00FFFF", "#0F0F0F", "#1A1A1A"],
+            ["#FFC1CC", "#FF69B4", "#FFF0F5", "#87CEFA", "#E6E6FA"],
+            ["#D26C1D", "#F2B705", "#F7D488", "#A6A6A6", "#3C3C3C"],
+            ["#121212", "#001F3F", "#0074D9", "#39CCCC", "#7FDBFF"],
+            ["#F3EFE0", "#D1B280", "#AA7434", "#66503D", "#30241B"],
+            ["#243447", "#14171A", "#657786", "#AAB8C2", "#E1E8ED"],
+            ["#2B2D42", "#8D99AE", "#EDF2F4", "#EF233C", "#D90429"],
+            ["#1B1B1E", "#2C2C34", "#404040", "#676767", "#999999"],
+            ["#FAF3DD", "#C8D5B9", "#8FC0A9", "#68B0AB", "#4A7C59"],
+        ],
+    },
+    {
+        category: "Games & Visual Styles",
+        palettes: [
+            ["#0D0221", "#540D6E", "#EE4266", "#FFD23F", "#3BCEAC"],
+            ["#FF004D", "#7E2553", "#008751", "#AB5236", "#1D2B53"],
+            ["#231942", "#5E548E", "#9F86C0", "#BE95C4", "#E0B1CB"],
+            ["#8D99AE", "#2B2D42", "#EF233C", "#D90429", "#EDF2F4"],
+            ["#2C3E50", "#34495E", "#16A085", "#27AE60", "#2980B9"],
+            ["#101820", "#FEE715", "#FF6F61", "#6B5B95", "#88B04B"],
+            ["#282828", "#3C3C3C", "#FFD700", "#B22222", "#8B0000"],
+            ["#212121", "#484848", "#FF4081", "#3F51B5", "#607D8B"],
+            ["#202124", "#5F6368", "#8AB4F8", "#34A853", "#EA4335"],
+            ["#3C1642", "#086375", "#1DD3B0", "#AFFC41", "#B2FF9E"],
+        ],
+    },
+    {
+        category: "Design Aesthetics",
+        palettes: [
+            ["#FF6EC7", "#B983FF", "#8AAAE5", "#C3FBD8", "#F5C7B8"],
+            ["#F2F2F2", "#D9D9D9", "#BFBFBF", "#A6A6A6", "#737373"],
+            ["#E63946", "#F1FAEE", "#A8DADC", "#457B9D", "#1D3557"],
+            ["#FFD700", "#C0C0C0", "#8B0000", "#00CED1", "#FF4500"],
+            ["#FFE6F7", "#E0BBE4", "#957DAD", "#D291BC", "#FEC8D8"],
+            ["#EFEFEF", "#CCCCCC", "#999999", "#666666", "#333333"],
+            ["#F9F9F9", "#EAEAEA", "#D5D5D5", "#C0C0C0", "#A3A3A3"],
+            ["#E6E6FA", "#D8BFD8", "#DDA0DD", "#BA55D3", "#9932CC"],
+            ["#FAF3E0", "#E4C580", "#C49250", "#8C6A36", "#5A4225"],
+            ["#E9ECEF", "#DEE2E6", "#CED4DA", "#ADB5BD", "#6C757D"],
+        ],
+    },
+    {
+        category: "Social & Branding Colors",
+        palettes: [
+            ["#405DE6", "#5851DB", "#833AB4", "#C13584", "#E1306C"], // Instagram
+            ["#010101", "#25F4EE", "#FE2C55", "#000000", "#FFFFFF"], // TikTok
+            ["#0077B5", "#2867B2", "#0E76A8", "#004182", "#FFFFFF"], // LinkedIn
+            ["#E60023", "#BD081C", "#A30000", "#B00000", "#F5F5F5"], // Pinterest
+            ["#1DA1F2", "#14171A", "#657786", "#AAB8C2", "#E1E8ED"], // Twitter/X
+            ["#1877F2", "#4267B2", "#23345D", "#3B5998", "#F5F6F7"], // Facebook
+            ["#FEE500", "#000000", "#3C1E1E", "#FAE100", "#1C1B1B"], // KakaoTalk
+            ["#7289DA", "#99AAB5", "#2C2F33", "#23272A", "#FFFFFF"], // Discord
+            ["#FC4F4F", "#FF6F61", "#FF9A8B", "#FFE0AC", "#FAF3DD"], // Influencer style
+            ["#F7F9FA", "#EDF0F5", "#C8D0E0", "#B3BEDC", "#8895A2"], // Productivity apps
+        ],
+    },
+    {
+        category: "Mental Wellness & Calm",
+        palettes: [
+            ["#A8D5BA", "#F9F7F7", "#F6D6AD", "#F6CAC9", "#F49D6E"],
+            ["#FDFCDC", "#D0F4DE", "#A9DEF9", "#E4C1F9", "#F694C1"],
+            ["#C9E4DE", "#FAF3DD", "#F7D9D9", "#E4C1F9", "#C6DEF1"],
+            ["#D5E1DF", "#E3EAA7", "#86AF49", "#D9BF77", "#D0E1F9"],
+            ["#B8E0D2", "#F2D7EE", "#F7F6F2", "#E3FDFD", "#FFE0AC"],
+            ["#D6F8D6", "#AAF0D1", "#CBF1F5", "#E5E5E5", "#F5F5F5"],
+            ["#E0F7FA", "#B2EBF2", "#80DEEA", "#4DD0E1", "#26C6DA"],
+            ["#A3C6C4", "#BFD8D2", "#E0E0E0", "#DADADA", "#B8B8B8"],
+            ["#D7FBE8", "#A9FBD7", "#8BF6D7", "#6FFFE9", "#00E5FF"],
+            ["#DADAD9", "#A3C6C4", "#B5CDA3", "#CCE3DE", "#EAF4F4"],
+        ],
+    },
 ];

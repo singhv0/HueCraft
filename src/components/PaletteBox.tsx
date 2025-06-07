@@ -100,7 +100,7 @@ export default function PaletteBox({
                 style={{ background: color }}
                 tabIndex={0}
                 title="Copy HEX"
-                onClick={() => handleCopy(color, idx)}
+                onClick={() => handleCopy(color, idx)} // <-- Only copy, not apply
               >
                 {/* Copy icon appears on hover, now on the left */}
                 <span
@@ -159,7 +159,7 @@ export default function PaletteBox({
           >
             <LayoutPanelLeft
               size={16}
-              strokeWidth={2.2}
+              strokeWidth={2.1}
               fill={isShowcaseOpen && isActive ? "#000" : "none"}
               className={`
                 transition-all

@@ -13,7 +13,7 @@ export default function GalleryPage() {
 	const [appliedPalette, setAppliedPalette] = useState<string[]>(
 		CATEGORIZED_PALETTES[0].palettes[0]
 	);
-	const [showShowcase, setShowShowcase] = useState(true);
+	const [showShowcase, setShowShowcase] = useState(false);
 
 	const categories = ["All", ...CATEGORIZED_PALETTES.map((c) => c.category)];
 	const filteredSections =
