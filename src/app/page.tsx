@@ -15,6 +15,11 @@ export default function Home() {
         <PalettePreview />
       </main>
       {/* <Footer /> */}
+      {/* 2-color bar below hero section */}
+      <div className="fixed bottom-0 left-0 w-full h-2 overflow-hidden flex shadow-md z-50">
+        <div className="flex-2 bg-[#2D3142]" />
+        <div className="flex-3 bg-[#5BC0BE]" />
+      </div>
     </div>
   );
 }

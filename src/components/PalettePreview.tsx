@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Copy, Stars } from "lucide-react";
+import { CATEGORIZED_PALETTES } from "../data/categorized-palettes";
 
 const DEFAULT_COLORS = [
   "#ffbe0b", // amber
@@ -16,9 +17,22 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [popupPos, setPopupPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [generateHovered, setGenerateHovered] = useState(false);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null); // <-- Move here
 
   const handleGenerate = () => {
-    setPalette([...palette].sort(() => Math.random() - 0.5));
+    // Flatten all palettes into one array
+    const allPalettes = CATEGORIZED_PALETTES.flatMap(cat => cat.palettes);
+    // Pick a random palette
+    const randomPalette = allPalettes[Math.floor(Math.random() * allPalettes.length)];
+    setPalette(randomPalette);
+  };
+
+  const handleCopy = async (color: string, idx: number) => {
+    try {
+      await navigator.clipboard.writeText(color.toUpperCase());
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(null), 1000);
+    } catch {}
   };
 
   return (
@@ -28,7 +42,7 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
           className="flex flex-row mb-10 mx-auto rounded-3xl bg-gray-100"
           style={{
             height: "21rem",
-            width: "50rem",
+            width: "45rem",
             boxShadow: "0px 0px 0px 0px rgba(0,0,0,0.2)" // right & down
           }}
         >
@@ -37,17 +51,6 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
             const hsl = rgbToHsl(rgb);
             const hsv = rgbToHsv(rgb);
             const cmyk = rgbToCmyk(rgb);
-
-            // Track copy state for feedback (optional)
-            const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
-
-            const handleCopy = async (color: string, idx: number) => {
-              try {
-                await navigator.clipboard.writeText(color.toUpperCase());
-                setCopiedIdx(idx);
-                setTimeout(() => setCopiedIdx(null), 1000);
-              } catch {}
-            };
 
             // Determine border radius
             let rounded = "";
@@ -80,9 +83,13 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
                   ${rounded}
                   shadow-none
                   relative flex items-center justify-center outline-none
-                  ${copiedIdx === idx ? "ring-4 ring-white ring-opacity-80 animate-glow" : ""}
+                  ${copiedIdx === idx ? "ring-20 ring-opacity-50 animate-glow" : ""}
                 `}
-                  style={{ background: color }}
+                  style={{
+                    background: color,
+                    // Dynamically set ring color when copied
+                    ...(copiedIdx === idx ? { boxShadow: `0 0 0 4px ${color}CC` } : {})
+                  }}
                   title={color}
                   tabIndex={0}
                   onClick={() => handleCopy(color, idx)}
