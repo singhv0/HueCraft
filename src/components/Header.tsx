@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import Logo3D from "./Logo3D";
-import Link from "next/link"; // Add this import
+import Link from "next/link";
+import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [hovered, setHovered] = useState(false);
   const [signupHovered, setSignupHovered] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const router = useRouter();
 
   return (
-    <header className="w-full py-8 flex items-center justify-between">
+    <header className="w-full py-8 flex items-center justify-between relative">
       <div className="flex items-center gap-3">
         <Logo3D />
         <Link href="/" passHref legacyBehavior>
@@ -34,8 +38,40 @@ export default function Header() {
           </a>
         </Link>
       </div>
-      <div className="flex items-center gap-4">
-        <button className="px-4 py-2 rounded-2xl text-black hover:bg-gray-100 transition">Tools</button>
+      <div className="flex items-center gap-4 relative">
+        {/* Tools Dropdown */}
+        <div className="relative">
+          <button
+            className="px-4 py-2 rounded-2xl text-black hover:bg-gray-100 transition flex items-center gap-1"
+            onClick={() => setToolsOpen((open) => !open)}
+            onBlur={() => setTimeout(() => setToolsOpen(false), 150)}
+          >
+            Tools
+            <ChevronDown size={18} className="ml-1" />
+          </button>
+          {toolsOpen && (
+            <div className="absolute left-0 mt-4 w-48 rounded-3xl shadow-lg z-50 flex flex-col px-2 py-2 gap-2 bg-white/30 backdrop-blur-md">
+              <button
+                className="text-left px-4 py-2 rounded-2xl hover:bg-white/40 transition"
+                onClick={() => {
+                  setToolsOpen(false);
+                  router.push("/gallery");
+                }}
+              >
+                Category
+              </button>
+              <button
+                className="text-left px-4 py-2 rounded-2xl hover:bg-white/40 transition"
+                onClick={() => {
+                  setToolsOpen(false);
+                  router.push("/palette-edit");
+                }}
+              >
+                Edit Palette
+              </button>
+            </div>
+          )}
+        </div>
         <span className="h-6 w-px bg-gray-300"></span>
         <button className="px-4 py-2 rounded-2xl text-black hover:bg-gray-100 transition">Sign in</button>
         <button
