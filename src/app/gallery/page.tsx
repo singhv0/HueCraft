@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import PaletteShowcase from "@/components/PaletteShowcase";
 import { CATEGORIZED_PALETTES } from "@/data/categorized-palettes";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function GalleryPage() {
 	const [activeCategory, setActiveCategory] = useState<string>("All");
@@ -14,6 +15,7 @@ export default function GalleryPage() {
 		CATEGORIZED_PALETTES[0].palettes[0]
 	);
 	const [showShowcase, setShowShowcase] = useState(false);
+	const router = useRouter();
 
 	const categories = ["All", ...CATEGORIZED_PALETTES.map((c) => c.category)];
 	const filteredSections =
@@ -67,6 +69,7 @@ export default function GalleryPage() {
 					{/* Palettes */}
 					<AnimatePresence mode="wait">
 						{filteredSections.map((section, index) => {
+							const isMentalWellness = section.category === "Mental Wellness & Calm";
 							return (
 								<motion.div
 									key={section.category}
@@ -98,15 +101,20 @@ export default function GalleryPage() {
 														height="8rem"
 														onApply={() => {
 															if (showShowcase && isActive) {
-																setShowShowcase(false); // Hide if already open and active
+																setShowShowcase(false);
 															} else {
 																setAppliedPalette(palette);
-																setShowShowcase(true); // Open and apply
+																setShowShowcase(true);
 															}
 														}}
 														showLayoutPanelLeft={true}
 														isShowcaseOpen={showShowcase}
 														isActive={isActive}
+														textColor={isMentalWellness ? "black" : undefined}
+														onEdit={() => {
+															// Pass palette as comma-separated hex in query
+															router.push(`/palette-edit?colors=${palette.join(",")}`);
+														}}
 													/>
 												</motion.div>
 											);

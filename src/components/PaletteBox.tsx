@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Copy, MoreHorizontal, Bookmark, LayoutPanelLeft } from "lucide-react";
+import { Copy, MoreHorizontal, Bookmark, LayoutPanelLeft, Pencil, Eye } from "lucide-react";
 
 export default function PaletteBox({
   colors,
@@ -9,6 +9,9 @@ export default function PaletteBox({
   showLayoutPanelLeft = true,
   isShowcaseOpen = false,
   isActive = false,
+  textColor, // <-- add this prop
+  onEdit, // <-- add this prop
+  onView, // <-- add this prop
 }: {
   colors: string[];
   height?: string;
@@ -16,6 +19,9 @@ export default function PaletteBox({
   showLayoutPanelLeft?: boolean;
   isShowcaseOpen?: boolean;
   isActive?: boolean;
+  textColor?: "black";
+  onEdit?: () => void; // <-- add this prop type
+  onView?: () => void;
 }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
@@ -59,6 +65,10 @@ export default function PaletteBox({
     setLayoutPopping(true);
     setTimeout(() => setLayoutPopping(false), 350);
   };
+
+  // Use black or white for text and icons
+  const iconColor = textColor === "black" ? "#000" : "#fff";
+  const textClass = textColor === "black" ? "text-black" : "text-white";
 
   return (
     <div className="relative w-full flex flex-col items-center" style={{ minHeight: height }}>
@@ -113,19 +123,23 @@ export default function PaletteBox({
                   <span className="relative block w-6 h-6">
                     <Copy
                       size={14}
-                      className={`text-white absolute inset-0 transition-transform duration-300
-                        ${copiedIdx === idx ? "scale-0 rotate-45 opacity-0" : "scale-100 opacity-100"}
-                      `}
+                      className={`absolute inset-0 transition-transform duration-300`}
+                      color={iconColor} // <-- use black if needed
+                      style={{
+                        ...(copiedIdx === idx
+                          ? { transform: "scale(0) rotate(45deg)", opacity: 0 }
+                          : { transform: "scale(1)", opacity: 1 }),
+                      }}
                     />
                     {/* Animated checkmark */}
                     <svg
                       className={`
-                        absolute inset-0 w-6 h-6 text-white transition-all duration-300
+                        absolute inset-0 w-6 h-6 transition-all duration-300
                         ${copiedIdx === idx ? "opacity-100 scale-100" : "opacity-0 scale-50"}
                       `}
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor"
+                      stroke={iconColor} // <-- use black if needed
                       strokeWidth={2}
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -135,9 +149,10 @@ export default function PaletteBox({
                 {/* HEX code centered on the bar */}
                 <span
                   className={`
-                    absolute inset-0 flex items-center justify-center font-lexend text-white text-xs font-light drop-shadow
+                    absolute inset-0 flex items-center justify-center font-lexend text-xs font-light drop-shadow
                     transition-opacity duration-200
                     ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
+                    ${textClass} // <-- use black if needed
                   `}
                 >
                   {color.toUpperCase()}
@@ -210,6 +225,36 @@ export default function PaletteBox({
             style={{ pointerEvents: "auto", background: "none", border: "none", boxShadow: "none", padding: 0 }}
           >
             <MoreHorizontal size={22} className="text-black" />
+          </button>
+          {/* Pencil icon for edit */}
+          <button
+            className="transition"
+            title="Edit Palette"
+            style={{
+              pointerEvents: "auto",
+              background: "none",
+              border: "none",
+              boxShadow: "none",
+              padding: 0,
+            }}
+            onClick={onEdit}
+          >
+            <Pencil size={18} className="text-black" />
+          </button>
+          {/* Eye icon for view */}
+          <button
+            className="transition"
+            title="View Palette Details"
+            style={{
+              pointerEvents: "auto",
+              background: "none",
+              border: "none",
+              boxShadow: "none",
+              padding: 0,
+            }}
+            onClick={onView}
+          >
+            <Eye size={18} className="text-black" />
           </button>
         </div>
       </div>
