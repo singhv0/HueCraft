@@ -9,7 +9,7 @@ export default function Header() {
   const [signupHovered, setSignupHovered] = useState(false);
 
   return (
-    <header className="w-full py-10 flex items-center justify-between">
+    <header className="w-full py-8 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <Logo3D />
         <Link href="/" passHref legacyBehavior>

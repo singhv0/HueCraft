@@ -1,13 +1,28 @@
 "use client";
 import { useState } from "react";
-import { Copy, MoreHorizontal, Bookmark } from "lucide-react";
+import { Copy, MoreHorizontal, Bookmark, LayoutPanelLeft } from "lucide-react";
 
-export default function PaletteBox({ colors, height = "4rem" }: { colors: string[], height?: string }) {
+export default function PaletteBox({
+  colors,
+  height = "4rem",
+  onApply,
+  showLayoutPanelLeft = true,
+  isShowcaseOpen = false,
+  isActive = false,
+}: {
+  colors: string[];
+  height?: string;
+  onApply?: () => void;
+  showLayoutPanelLeft?: boolean;
+  isShowcaseOpen?: boolean;
+  isActive?: boolean;
+}) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [copiedTailwind, setCopiedTailwind] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [bookmarkPopping, setBookmarkPopping] = useState(false);
+  const [layoutPopping, setLayoutPopping] = useState(false);
 
   const handleCopy = async (color: string, idx: number) => {
     try {
@@ -19,7 +34,7 @@ export default function PaletteBox({ colors, height = "4rem" }: { colors: string
 
   // Copy Tailwind CSS palette as a string like: "bg-[#ffbe0b] bg-[#fb5607] ..."
   const handleCopyTailwind = async () => {
-    const tailwind = colors.map(c => `bg-[${c}]`).join(" ");
+    const tailwind = colors.map((c) => `bg-[${c}]`).join(" ");
     try {
       await navigator.clipboard.writeText(tailwind);
       setCopiedTailwind(true);
@@ -28,9 +43,21 @@ export default function PaletteBox({ colors, height = "4rem" }: { colors: string
   };
 
   const handleBookmarkClick = () => {
-    setBookmarked(b => !b);
+    setBookmarked((b) => !b);
     setBookmarkPopping(true);
     setTimeout(() => setBookmarkPopping(false), 350); // match duration-300
+  };
+
+  const handleLayoutClick = () => {
+    if (isShowcaseOpen && isActive) {
+      // If open and this palette is active, hide the showcase
+      if (onApply) onApply(); // onApply should handle toggling showcase off
+    } else {
+      // Otherwise, open and apply this palette
+      if (onApply) onApply();
+    }
+    setLayoutPopping(true);
+    setTimeout(() => setLayoutPopping(false), 350);
   };
 
   return (
@@ -121,44 +148,70 @@ export default function PaletteBox({ colors, height = "4rem" }: { colors: string
         })}
       </div>
       {/* Icon bar below the palette box */}
-      <div className="flex flex-row items-center justify-end gap-2 mt-2 w-full px-2">
-        {/* Bookmark icon (now in place of heart, to the left of 3 dots) */}
-        <button
-          className="transition"
-          title="Bookmark"
-          style={{
-            pointerEvents: "auto",
-            background: "none",
-            border: "none",
-            boxShadow: "none",
-            padding: 0,
-          }}
-          onClick={handleBookmarkClick}
-        >
-          <Bookmark
-            size={16}
-            fill={bookmarked ? "#000" : "none"}
-            strokeWidth={2.2}
-            className={`
-              transition-all
-              duration-300
-              ${bookmarked ? "text-black" : "text-black"}
-              ${bookmarkPopping ? "scale-125" : "scale-100"}
-            `}
+      <div className="flex flex-row items-center justify-between gap-2 mt-2 w-full px-2">
+        {/* Layout panel icon on the left */}
+        {showLayoutPanelLeft && (
+          <button
+            className="p-2 rounded-xl transition"
+            onClick={handleLayoutClick}
+            title={isShowcaseOpen && isActive ? "Hide Showcase" : "Showcase this palette"}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
+            <LayoutPanelLeft
+              size={16}
+              strokeWidth={2.2}
+              fill={isShowcaseOpen && isActive ? "#000" : "none"}
+              className={`
+                transition-all
+                duration-300
+                ${isShowcaseOpen && isActive ? "text-black" : "text-black"}
+                ${layoutPopping ? "scale-125" : "scale-100"}
+              `}
+              style={{
+                transitionTimingFunction: "cubic-bezier(.4,2,.6,1)",
+              }}
+            />
+          </button>
+        )}
+        <div className="flex flex-row items-center gap-2 ml-auto">
+          {/* Bookmark icon */}
+          <button
+            className="transition"
+            title="Bookmark"
             style={{
-              transitionTimingFunction: "cubic-bezier(.4,2,.6,1)",
+              pointerEvents: "auto",
+              background: "none",
+              border: "none",
+              boxShadow: "none",
+              padding: 0,
             }}
-          />
-        </button>
-        {/* 3 dots icon on the right */}
-        <button
-          className="transition"
-          title="Copy Tailwind CSS classes"
-          onClick={handleCopyTailwind}
-          style={{ pointerEvents: "auto", background: "none", border: "none", boxShadow: "none", padding: 0 }}
-        >
-          <MoreHorizontal size={22} className="text-black" />
-        </button>
+            onClick={handleBookmarkClick}
+          >
+            <Bookmark
+              size={16}
+              fill={bookmarked ? "#000" : "none"}
+              strokeWidth={2.2}
+              className={`
+                transition-all
+                duration-300
+                ${bookmarked ? "text-black" : "text-black"}
+                ${bookmarkPopping ? "scale-125" : "scale-100"}
+              `}
+              style={{
+                transitionTimingFunction: "cubic-bezier(.4,2,.6,1)",
+              }}
+            />
+          </button>
+          {/* 3 dots icon on the right */}
+          <button
+            className="transition"
+            title="Copy Tailwind CSS classes"
+            onClick={handleCopyTailwind}
+            style={{ pointerEvents: "auto", background: "none", border: "none", boxShadow: "none", padding: 0 }}
+          >
+            <MoreHorizontal size={22} className="text-black" />
+          </button>
+        </div>
       </div>
       {/* Feedback */}
       {copiedTailwind && (
