@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
-import { Copy, MoreHorizontal, Bookmark, LayoutPanelLeft, Pencil } from "lucide-react";
+import React, { useState } from "react";
+import { Copy, MoreHorizontal, Bookmark, LayoutPanelLeft, Pencil, Plus, Minus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function PaletteBox({
   colors,
-  height = "4rem",
+  height = "20rem", // Increased height for preview editor
   onApply,
   showLayoutPanelLeft = true,
   isShowcaseOpen = false,
@@ -13,6 +13,11 @@ export default function PaletteBox({
   textColor,
   onEdit,
   onView,
+  staticAnimation = false,
+  onAddColorBetween,
+  onRemoveColor, // <-- new prop
+  animatedIdx, // <-- new prop
+  pendingIdx,
 }: {
   colors: string[];
   height?: string;
@@ -23,9 +28,14 @@ export default function PaletteBox({
   textColor?: "black";
   onEdit?: () => void;
   onView?: () => void;
+  staticAnimation?: boolean;
+  onAddColorBetween?: (idx: number) => void;
+  onRemoveColor?: (idx: number) => void; // <-- new prop type
+  animatedIdx?: number; // <-- new prop type
+  pendingIdx?: number;
 }) {
   const router = useRouter();
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [hoveredIdx, setHoveredIdx] = useState<number | string | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [copiedTailwind, setCopiedTailwind] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
@@ -79,29 +89,32 @@ export default function PaletteBox({
   return (
     <div className="relative w-full flex flex-col items-center" style={{ minHeight: height }}>
       <div
-        className="flex flex-row w-full rounded-3xl bg-gray-100"
-        style={{
-          height,
-          boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)",
-        }}
+        className="flex flex-row w-full rounded-3xl bg-gray-100 items-stretch relative"
+        style={{ height, boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)" }}
       >
-        {colors.map((color, idx) => {
-          let rounded = "";
-          if (idx === 0) rounded = "rounded-l-3xl";
-          else if (idx === colors.length - 1) rounded = "rounded-r-3xl";
-          return (
+        {colors.map((color, idx) => (
+          <React.Fragment key={color + idx}>
+            {/* Color bar */}
             <div
-              key={color + idx}
               className={`
-                group relative transition-all duration-300
-                ${rounded}
-                ${hoveredIdx === idx ? "z-10" : ""}
+                group relative
+                transition-[flex-grow] duration-200
+                ${idx === 0 ? "rounded-l-3xl" : ""}
+                ${idx === colors.length - 1 ? "rounded-r-3xl" : ""}
                 flex-1
               `}
               style={{
-                flexGrow: hoveredIdx === idx ? 2 : 1,
-                transition: "flex-grow 0.3s cubic-bezier(.4,2,.6,1), z-index 0s",
+                flexGrow:
+                  typeof pendingIdx === "number" && pendingIdx === idx
+                    ? 0
+                    : staticAnimation
+                    ? 1
+                    : hoveredIdx === idx
+                    ? 2
+                    : 1,
+                transition: "flex-grow 0.2s ease", // faster animation
                 height: "100%",
+                marginRight: 0,
               }}
               onMouseEnter={() => setHoveredIdx(idx)}
               onMouseLeave={() => setHoveredIdx(null)}
@@ -109,7 +122,8 @@ export default function PaletteBox({
               <button
                 className={`
                   h-full w-full transition-all duration-300
-                  ${rounded}
+                  ${idx === 0 ? "rounded-l-3xl" : ""}
+                  ${idx === colors.length - 1 ? "rounded-r-3xl" : ""}
                   shadow-none
                   relative flex items-center justify-center outline-none
                 `}
@@ -118,6 +132,28 @@ export default function PaletteBox({
                 title="Copy HEX"
                 onClick={() => handleCopy(color, idx)} // <-- Only copy, not apply
               >
+                {/* Minus icon at the center of the color bar */}
+                {onRemoveColor && colors.length > 2 && (
+                  <span
+                    className={`
+                      absolute z-40 top-3/5 left-1/2 -translate-x-1/2 -translate-y-1/2
+                      transition-opacity duration-200
+                      ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
+                    `}
+                  >
+                    <button
+                      className="p-1 transition flex items-center justify-center"
+                      title="Remove color"
+                      onClick={e => {
+                        e.stopPropagation();
+                        onRemoveColor(idx);
+                      }}
+                      tabIndex={0}
+                    >
+                      <Minus size={18} className="text-white" />
+                    </button>
+                  </span>
+                )}
                 {/* Copy icon appears on hover, now on the left */}
                 <span
                   className={`
@@ -165,8 +201,40 @@ export default function PaletteBox({
                 </span>
               </button>
             </div>
-          );
-        })}
+            {/* Plus icon between bars */}
+            {onAddColorBetween && idx < colors.length - 1 && colors.length < 10 && (
+              <div
+                className="z-30 absolute group"
+                style={{
+                  left: `calc(${((idx + 1) / colors.length) * 100}%)`,
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                  pointerEvents: "auto",
+                }}
+                onMouseEnter={() => setHoveredIdx(`plus-${idx}`)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              >
+                <button
+                  className={`
+                    p-1 rounded-full bg-white transition flex items-center justify-center
+                    ${hoveredIdx === `plus-${idx}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
+                    transition-opacity duration-200
+                  `}
+                  title="Add color between"
+                  onClick={() => onAddColorBetween(idx)}
+                  tabIndex={0}
+                  style={{
+                    pointerEvents: "auto",
+                  }}
+                  onFocus={() => setHoveredIdx(`plus-${idx}`)}
+                  onBlur={() => setHoveredIdx(null)}
+                >
+                  <Plus size={18} />
+                </button>
+              </div>
+            )}
+          </React.Fragment>
+        ))}
       </div>
       {/* Icon bar below the palette box (now only rendered if showLayoutPanelLeft is true) */}
       {showLayoutPanelLeft && (
@@ -197,11 +265,7 @@ export default function PaletteBox({
           <button
             className={`transition hover:bg-gray-100 rounded-full p-1.5 ${bookmarked ? "bg-gray-200" : ""}`}
             title="Bookmark Palette"
-            onClick={() => {
-              setBookmarked((b) => !b);
-              setBookmarkPopping(true);
-              setTimeout(() => setBookmarkPopping(false), 350);
-            }}
+            onClick={handleBookmarkClick}
           >
             <Bookmark
               size={18}

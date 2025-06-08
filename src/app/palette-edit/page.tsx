@@ -1,19 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
-import PaletteBox from "@/components/PaletteBox";
 import { CATEGORIZED_PALETTES } from "@/data/categorized-palettes";
 import { Stars, Eye, Bookmark, MoreHorizontal } from "lucide-react";
 import { Dialog } from "@headlessui/react";
+import PaletteEditor from "@/components/PaletteEditor";
 
 export default function PaletteEditPage() {
   const searchParams = useSearchParams();
   const colorsParam = searchParams.get("colors");
-  const initialColors = colorsParam ? colorsParam.split(",") : [];
+  const [palette, setPalette] = useState<string[]>([]);
 
-  // Local state for palette editing/generation
-  const [palette, setPalette] = useState<string[]>(initialColors);
+  useEffect(() => {
+    if (colorsParam) {
+      setPalette(colorsParam.split(","));
+    }
+  }, [colorsParam]);
+
   const [generateHovered, setGenerateHovered] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
@@ -57,7 +61,6 @@ export default function PaletteEditPage() {
                   size={18}
                   className={`text-black transition-all duration-300 ${bookmarked ? "scale-125" : "scale-100"}`}
                   fill={bookmarked ? "#000" : "none"}
-                  style={{ transitionTimingFunction: "cubic-bezier(.4,2,.6,1)" }}
                 />
               </button>
               {/* 3-dot icon */}
@@ -77,11 +80,11 @@ export default function PaletteEditPage() {
               </button>
             </div>
           </div>
-          <PaletteBox
-            colors={palette}
-            height="24rem"
-            showLayoutPanelLeft={false}
-          />
+          {/* PaletteEditor replaces PaletteBox and uses the same proportions */}
+          {palette.length > 0 && (
+            <PaletteEditor palette={palette} setPalette={setPalette} />
+          )}
+          {/* Generate button randomizes the palette in the editor */}
           <button
             onClick={handleGenerate}
             className={`

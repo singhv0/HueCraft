@@ -16,26 +16,25 @@ export default function Header() {
     <header className="w-full py-8 flex items-center justify-between relative">
       <div className="flex items-center gap-3">
         <Logo3D />
-        <Link href="/" passHref legacyBehavior>
-          <a
-            className={`
-              text-2xl font-semibold transition-all duration-300
-              ${hovered
-                ? "bg-gradient-to-r from-[#ffbe0b] via-[#fb5607] via-[#ff006e] via-[#8338ec] to-[#3a86ff] bg-clip-text text-transparent animate-gradient-move"
-                : "text-black"
-              }
-            `}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            style={{
-              backgroundSize: hovered ? "200% 200%" : undefined,
-              backgroundPosition: hovered ? "right center" : undefined,
-              cursor: "pointer",
-              textDecoration: "none",
-            }}
-          >
-            HueCraft
-          </a>
+        <Link
+          href="/"
+          className={`
+            text-2xl font-semibold transition-all duration-300
+            ${hovered
+              ? "bg-gradient-to-r from-[#ffbe0b] via-[#fb5607] via-[#ff006e] via-[#8338ec] to-[#3a86ff] bg-clip-text text-transparent animate-gradient-move"
+              : "text-black"
+            }
+          `}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          style={{
+            backgroundSize: hovered ? "200% 200%" : undefined,
+            backgroundPosition: hovered ? "right center" : undefined,
+            cursor: "pointer",
+            textDecoration: "none",
+          }}
+        >
+          HueCraft
         </Link>
       </div>
       <div className="flex items-center gap-4 relative">
