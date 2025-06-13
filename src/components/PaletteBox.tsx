@@ -5,6 +5,245 @@ import { useRouter } from "next/navigation";
 import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+interface SortableItemProps {
+  color: string;
+  idx: number;
+  showDragHandle: boolean;
+  pendingIdx?: number;
+  staticAnimation?: boolean;
+  hoveredIdx: number | string | null;
+  setHoveredIdx: (value: number | string | null) => void;
+  onRemoveColor?: (idx: number) => void;
+  onAddColorBetween?: (idx: number) => void;
+  colors: string[];
+  iconColor: string;
+  textClass: string;
+  copiedIdx: number | null;
+  handleCopy: (color: string, idx: number) => void;
+}
+
+function SortableItem({ 
+  color, 
+  idx, 
+  showDragHandle,
+  pendingIdx,
+  staticAnimation,
+  hoveredIdx,
+  setHoveredIdx,
+  onRemoveColor,
+  onAddColorBetween,
+  colors,
+  iconColor,
+  textClass,
+  copiedIdx,
+  handleCopy
+}: SortableItemProps) {
+  const sortable = showDragHandle 
+    ? useSortable({
+        id: color + idx,
+        animateLayoutChanges: defaultAnimateLayoutChanges,
+      })
+    : {
+        attributes: {},
+        listeners: {},
+        setNodeRef: () => {},
+        transform: null,
+        transition: undefined,
+        isDragging: false
+      };
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = sortable;
+
+  return (
+    <React.Fragment key={color + idx}>
+      <div
+        ref={showDragHandle ? setNodeRef : undefined}
+        className={`
+          group relative
+          transition-[flex-grow] duration-200
+          ${idx === 0 ? "rounded-l-3xl" : ""}
+          ${idx === colors.length - 1 ? "rounded-r-3xl" : ""}
+          flex-1
+        `}
+        style={{
+          flexGrow:
+            typeof pendingIdx === "number" && pendingIdx === idx
+              ? 0
+              : staticAnimation
+              ? 1
+              : hoveredIdx === idx
+              ? 2
+              : 1,
+          transition: showDragHandle && transform
+            ? (transition || "transform 350ms cubic-bezier(.22,1,.36,1)")
+            : "flex-grow 350ms cubic-bezier(.4,2,.6,1)",
+          height: "100%",
+          marginRight: 0,
+          ...(showDragHandle && transform
+            ? {
+                transform: CSS.Transform.toString(transform),
+              }
+            : {}),
+          zIndex: isDragging ? 50 : "auto",
+        }}
+        onMouseEnter={() => setHoveredIdx(idx)}
+        onMouseLeave={() => setHoveredIdx(null)}
+      >
+        {/* --- Drag Handle: Sibling, not inside button --- */}
+        {showDragHandle && (
+          <button
+            type="button"
+            tabIndex={-1}
+            className={`
+              absolute left-1/2 top-35 -translate-x-1/2 z-50 p-0 m-0 cursor-grab
+              transition-opacity duration-200
+              ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
+            `}
+            title="Drag to reorder"
+            style={{ background: "none", pointerEvents: "auto" }}
+            onMouseEnter={() => setHoveredIdx(idx)}
+            onMouseLeave={() => setHoveredIdx(null)}
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical size={18} className="text-white" />
+          </button>
+        )}
+
+        {/* --- Main Color Button --- */}
+        <button
+          className={`
+            h-full w-full transition-all duration-300
+            ${idx === 0 ? "rounded-l-3xl" : ""}
+            ${idx === colors.length - 1 ? "rounded-r-3xl" : ""}
+            shadow-none
+            relative flex items-center justify-center outline-none
+          `}
+          style={{ background: color }}
+          tabIndex={0}
+          title="Copy HEX"
+          onClick={() => handleCopy(color, idx)}
+        >
+          {/* Minus icon at the center of the color bar */}
+          {onRemoveColor && colors.length > 2 && (
+            <span
+              className={`
+                absolute z-40 top-3/5 left-1/2 -translate-x-1/2 -translate-y-1/2
+                transition-opacity duration-200
+                ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
+              `}
+            >
+              <div
+                className="p-1 transition flex items-center justify-center cursor-pointer"
+                title="Remove color"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemoveColor(idx);
+                }}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.stopPropagation();
+                    onRemoveColor(idx);
+                  }
+                }}
+                role="button"
+                aria-label="Remove color"
+              >
+                <Minus size={18} className="text-white" />
+              </div>
+            </span>
+          )}
+          {/* Copy icon appears on hover, now on the left */}
+          <span
+            className={`
+              absolute left-2 top-2 transition-opacity p-2
+              ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
+              pointer-events-none
+            `}
+          >
+            <span className="relative block w-6 h-6">
+              <Copy
+                size={14}
+                className={`absolute inset-0 transition-transform duration-300`}
+                color={iconColor}
+                style={{
+                  ...(copiedIdx === idx
+                    ? { transform: "scale(0) rotate(45deg)", opacity: 0 }
+                    : { transform: "scale(1)", opacity: 1 }),
+                }}
+              />
+              {/* Animated checkmark */}
+              <svg
+                className={`
+                  absolute inset-0 w-6 h-6 transition-all duration-300
+                  ${copiedIdx === idx ? "opacity-100 scale-100" : "opacity-0 scale-50"}
+                `}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke={iconColor}
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+          </span>
+          {/* HEX code centered on the bar */}
+          <span
+            className={`
+              absolute inset-0 flex items-center justify-center font-lexend text-xs font-light drop-shadow
+              transition-opacity duration-200
+              ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
+              ${textClass}
+            `}
+          >
+            {color.toUpperCase()}
+          </span>
+        </button>
+      </div>
+      {/* Plus icon between bars */}
+      {onAddColorBetween && idx < colors.length - 1 && colors.length < 10 && (
+        <div
+          className="z-30 absolute group"
+          style={{
+            left: `calc(${((idx + 1) / colors.length) * 100}%)`,
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            pointerEvents: "auto",
+          }}
+          onMouseEnter={() => setHoveredIdx(`plus-${idx}`)}
+          onMouseLeave={() => setHoveredIdx(null)}
+        >
+          <button
+            className={`
+              p-1 rounded-full bg-white transition flex items-center justify-center
+              ${hoveredIdx === `plus-${idx}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
+              transition-opacity duration-200
+            `}
+            title="Add color between"
+            onClick={() => onAddColorBetween(idx)}
+            tabIndex={0}
+            style={{
+              pointerEvents: "auto",
+            }}
+            onFocus={() => setHoveredIdx(`plus-${idx}`)}
+            onBlur={() => setHoveredIdx(null)}
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
 export default function PaletteBox({
   colors,
   height = "20rem", // Increased height for preview editor
@@ -92,208 +331,27 @@ export default function PaletteBox({
 
   return (
     <div className="relative w-full flex flex-col items-center" style={{ minHeight: height }}>
-      <div
-        className="flex flex-row w-full rounded-3xl bg-gray-100 items-stretch relative"
-        style={{ height, boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)" }}
-      >
-        {colors.map((color, idx) => {
-          // Only useSortable if drag handle is enabled
-          let attributes = {};
-          let listeners = {};
-          let setNodeRef = (node: any) => {};
-          let transform = null;
-          let transition = undefined;
-          let isDragging = false;
-
-          if (showDragHandle) {
-            const sortable = useSortable({
-              id: color + idx,
-              animateLayoutChanges: defaultAnimateLayoutChanges,
-            });
-            attributes = showDragHandle ? sortable.attributes : {};
-            listeners = showDragHandle ? sortable.listeners ?? {} : {};
-            setNodeRef = showDragHandle ? sortable.setNodeRef : () => {};
-            transform = showDragHandle ? sortable.transform : null;
-            transition = showDragHandle ? sortable.transition : undefined;
-            isDragging = showDragHandle ? sortable.isDragging : false;
-          }
-
-          return (
-            <React.Fragment key={color + idx}>
-              <div
-                ref={showDragHandle ? setNodeRef : undefined}
-                className={`
-                  group relative
-                  transition-[flex-grow] duration-200
-                  ${idx === 0 ? "rounded-l-3xl" : ""}
-                  ${idx === colors.length - 1 ? "rounded-r-3xl" : ""}
-                  flex-1
-                `}
-                style={{
-                  flexGrow:
-                    typeof pendingIdx === "number" && pendingIdx === idx
-                      ? 0
-                      : staticAnimation
-                      ? 1
-                      : hoveredIdx === idx
-                      ? 2
-                      : 1,
-                  transition: showDragHandle && transform
-                    ? (transition || "transform 350ms cubic-bezier(.22,1,.36,1)")
-                    : "flex-grow 350ms cubic-bezier(.4,2,.6,1)", // <-- Use springy cubic-bezier for gallery/preview
-                  height: "100%",
-                  marginRight: 0,
-                  ...(showDragHandle && transform
-                    ? {
-                        transform: CSS.Transform.toString(transform),
-                      }
-                    : {}),
-                  zIndex: isDragging ? 50 : "auto",
-                }}
-                onMouseEnter={() => setHoveredIdx(idx)}
-                onMouseLeave={() => setHoveredIdx(null)}
-              >
-                {/* --- Drag Handle: Sibling, not inside button --- */}
-                {showDragHandle && (
-                  <button
-                    type="button"
-                    tabIndex={-1}
-                    className={`
-                      absolute left-1/2 top-35 -translate-x-1/2 z-50 p-0 m-0 cursor-grab
-                      transition-opacity duration-200
-                      ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
-                    `}
-                    title="Drag to reorder"
-                    style={{ background: "none", pointerEvents: "auto" }}
-                    onMouseEnter={() => setHoveredIdx(idx)}
-                    onMouseLeave={() => setHoveredIdx(null)}
-                    {...attributes}
-                    {...listeners}
-                  >
-                    <GripVertical size={18} className="text-white" />
-                  </button>
-                )}
-
-                {/* --- Main Color Button --- */}
-                <button
-                  className={`
-                    h-full w-full transition-all duration-300
-                    ${idx === 0 ? "rounded-l-3xl" : ""}
-                    ${idx === colors.length - 1 ? "rounded-r-3xl" : ""}
-                    shadow-none
-                    relative flex items-center justify-center outline-none
-                  `}
-                  style={{ background: color }}
-                  tabIndex={0}
-                  title="Copy HEX"
-                  onClick={() => handleCopy(color, idx)}
-                >
-                  {/* Minus icon at the center of the color bar */}
-                  {onRemoveColor && colors.length > 2 && (
-                    <span
-                      className={`
-                        absolute z-40 top-3/5 left-1/2 -translate-x-1/2 -translate-y-1/2
-                        transition-opacity duration-200
-                        ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
-                      `}
-                    >
-                      <button
-                        className="p-1 transition flex items-center justify-center"
-                        title="Remove color"
-                        onClick={e => {
-                          e.stopPropagation();
-                          onRemoveColor(idx);
-                        }}
-                        tabIndex={0}
-                      >
-                        <Minus size={18} className="text-white" />
-                      </button>
-                    </span>
-                  )}
-                  {/* Copy icon appears on hover, now on the left */}
-                  <span
-                    className={`
-                      absolute left-2 top-2 transition-opacity p-2
-                      ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
-                      pointer-events-none
-                    `}
-                  >
-                    <span className="relative block w-6 h-6">
-                      <Copy
-                        size={14}
-                        className={`absolute inset-0 transition-transform duration-300`}
-                        color={iconColor} // <-- use black if needed
-                        style={{
-                          ...(copiedIdx === idx
-                            ? { transform: "scale(0) rotate(45deg)", opacity: 0 }
-                            : { transform: "scale(1)", opacity: 1 }),
-                        }}
-                      />
-                      {/* Animated checkmark */}
-                      <svg
-                        className={`
-                          absolute inset-0 w-6 h-6 transition-all duration-300
-                          ${copiedIdx === idx ? "opacity-100 scale-100" : "opacity-0 scale-50"}
-                        `}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke={iconColor} // <-- use black if needed
-                        strokeWidth={2}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </span>
-                  </span>
-                  {/* HEX code centered on the bar */}
-                  <span
-                    className={`
-                      absolute inset-0 flex items-center justify-center font-lexend text-xs font-light drop-shadow
-                      transition-opacity duration-200
-                      ${hoveredIdx === idx ? "opacity-100" : "opacity-0"}
-                      ${textClass} // <-- use black if needed
-                    `}
-                  >
-                    {color.toUpperCase()}
-                  </span>
-                </button>
-              </div>
-              {/* Plus icon between bars */}
-              {onAddColorBetween && idx < colors.length - 1 && colors.length < 10 && (
-                <div
-                  className="z-30 absolute group"
-                  style={{
-                    left: `calc(${((idx + 1) / colors.length) * 100}%)`,
-                    top: "50%",
-                    transform: "translate(-50%, -50%)",
-                    pointerEvents: "auto",
-                  }}
-                  onMouseEnter={() => setHoveredIdx(`plus-${idx}`)}
-                  onMouseLeave={() => setHoveredIdx(null)}
-                >
-                  <button
-                    className={`
-                      p-1 rounded-full bg-white transition flex items-center justify-center
-                      ${hoveredIdx === `plus-${idx}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
-                      transition-opacity duration-200
-                    `}
-                    title="Add color between"
-                    onClick={() => onAddColorBetween(idx)}
-                    tabIndex={0}
-                    style={{
-                      pointerEvents: "auto",
-                    }}
-                    onFocus={() => setHoveredIdx(`plus-${idx}`)}
-                    onBlur={() => setHoveredIdx(null)}
-                  >
-                    <Plus size={18} />
-                  </button>
-                </div>
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
-      {/* Icon bar below the palette box (now only rendered if showLayoutPanelLeft is true) */}
+      <div className="flex flex-row w-full rounded-3xl bg-gray-100 items-stretch relative" style={{ height, boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)" }}>
+  {colors.map((color, idx) => (
+    <SortableItem
+      key={color + idx}
+      color={color}
+      idx={idx}
+      showDragHandle={showDragHandle}
+      pendingIdx={pendingIdx}
+      staticAnimation={staticAnimation}
+      hoveredIdx={hoveredIdx}
+      setHoveredIdx={setHoveredIdx}
+      onRemoveColor={onRemoveColor}
+      onAddColorBetween={onAddColorBetween}
+      colors={colors}
+      iconColor={iconColor}
+      textClass={textClass}
+      copiedIdx={copiedIdx}
+      handleCopy={handleCopy}
+    />
+  ))}
+</div>{/* Icon bar below the palette box (now only rendered if showLayoutPanelLeft is true) */}
       {showLayoutPanelLeft && (
         <div className="flex flex-row items-center justify-center gap-4 mt-2 w-full px-2">
           {/* Showcase icon */}
