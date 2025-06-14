@@ -20,6 +20,7 @@ interface SortableItemProps {
   textClass: string;
   copiedIdx: number | null;
   handleCopy: (color: string, idx: number) => void;
+  galleryMode?: boolean; 
 }
 
 function SortableItem({ 
@@ -60,6 +61,7 @@ function SortableItem({
     transition,
     isDragging
   } = sortable;
+  const MemoizedSortableItem = React.memo(SortableItem);
 
   return (
     <React.Fragment key={color + idx}>
@@ -284,6 +286,7 @@ export default function PaletteBox({
   const [bookmarked, setBookmarked] = useState(false);
   const [bookmarkPopping, setBookmarkPopping] = useState(false);
   const [layoutPopping, setLayoutPopping] = useState(false);
+  const MemoizedSortableItem = React.memo(SortableItem);
 
   const handleCopy = async (color: string, idx: number) => {
     try {
@@ -333,7 +336,7 @@ export default function PaletteBox({
     <div className="relative w-full flex flex-col items-center" style={{ minHeight: height }}>
       <div className="flex flex-row w-full rounded-3xl bg-gray-100 items-stretch relative" style={{ height, boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)" }}>
   {colors.map((color, idx) => (
-    <SortableItem
+    <MemoizedSortableItem
       key={color + idx}
       color={color}
       idx={idx}
