@@ -11,7 +11,7 @@ export default function Hero() {
   return (
     <section className="w-full py-2 mt-8 flex flex-col items-start text-left">
       <h2 className="text-6xl font-semibold mb-8 max-w-lg">
-        Color Suggestions That Just Make Sense
+        Color Suggestions That Just Make Sense 
       </h2>
       <div
         className="relative mb-8"
@@ -21,14 +21,14 @@ export default function Hero() {
         <button
           className={`
             px-6 py-2 rounded-2xl antialiased relative z-10
-            text-white font-light
+            text-black border-2 font-light
             transition-all duration-450
             outline-none
             overflow-hidden
             flex items-center justify-center  
             ${hovered 
-              ? "bg-gradient-to-r from-[#ffbe0b] via-[#fb5607] via-[#ff006e] via-[#8338ec] to-[#3a86ff] animate-gradient-move saturate-150 scale-100 w-45"
-              : "bg-black w-40"
+              ? "bg-gradient-to-r from-[#AAB8C2] to-[#FFFFFF] animate-gradient-move saturate-150 scale-100 w-45"
+              : "w-35"
             }
           `}
           style={{
@@ -49,7 +49,7 @@ export default function Hero() {
               flex items-center
             `}
           >
-            <ArrowRight size={22} className="text-white" />
+            <ArrowRight size={22} className="text-black" />
           </span>
         </button>
       </div>

@@ -39,7 +39,7 @@ export default function PalettePreview({ colors = DEFAULT_COLORS }: { colors?: s
     <aside className="relative z-30">
       <div>
         <div
-          className="flex flex-row mb-10 mx-auto rounded-3xl bg-gray-100"
+          className="flex flex-row mb-6 mx-auto rounded-3xl bg-gray-100"
           style={{
             height: "21rem",
             width: "45rem",

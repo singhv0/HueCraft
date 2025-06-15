@@ -262,6 +262,7 @@ export default function PaletteBox({
   animatedIdx, // <-- new prop
   pendingIdx,
   showDragHandle = false, // <-- add this
+  galleryMode = false, // <-- new prop for gallery mode
 }: {
   colors: string[];
   height?: string;
@@ -278,6 +279,9 @@ export default function PaletteBox({
   animatedIdx?: number; // <-- new prop type
   pendingIdx?: number;
   showDragHandle?: boolean; // <-- add this
+  galleryMode?: boolean; // <-- new prop for gallery mode
+    className?: string;
+
 }) {
   const router = useRouter();
   const [hoveredIdx, setHoveredIdx] = useState<number | string | null>(null);
@@ -333,9 +337,8 @@ export default function PaletteBox({
   const textClass = textColor === "black" ? "text-black" : "text-white";
 
   return (
-    <div className="relative w-full flex flex-col items-center" style={{ minHeight: height }}>
-      <div className="flex flex-row w-full rounded-3xl bg-gray-100 items-stretch relative" style={{ height, boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)" }}>
-  {colors.map((color, idx) => (
+    <div className={`relative w-full flex flex-col items-center ${galleryMode ? 'gallery-palette' : ''}`} style={{ minHeight: height }}>
+<div className="flex flex-row w-full rounded-3xl bg-gray-100 items-stretch relative palette-container" style={{ height, boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)" }}>  {colors.map((color, idx) => (
     <MemoizedSortableItem
       key={color + idx}
       color={color}

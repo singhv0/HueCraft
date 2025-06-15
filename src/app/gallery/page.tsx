@@ -56,7 +56,7 @@ export default function GalleryPage() {
 						showShowcase ? "" : "w-full"
 					}`}
 				>
-					<h1 className="text-4xl font-bold mb-8">Explore Categories</h1>
+					<h1 className="text-4xl text-center font-medium mb-12">Categories</h1>
 					{/* Category Filter */}
 					<div className="flex flex-wrap gap-3 mb-10 ">
 						{categories.map((category) => (
@@ -89,7 +89,7 @@ export default function GalleryPage() {
 									transition={{ duration: 0.2, ease: "easeInOut" }}
 								>
 									{activeCategory === "All" && (
-										<h2 className="text-2xl font-semibold mb-4 text-center">
+										<h2 className="text-md font-light mb-4 text-gray-500 text-center">
 											{section.category}
 										</h2>
 									)}
@@ -105,7 +105,7 @@ export default function GalleryPage() {
 													exit={{ opacity: 0, scale: 0.95 }}
 													transition={{ duration: 0.25 }}
 												>
-													<PaletteBox
+													<PaletteBox 
 														colors={palette}
 														height="8rem"
 														onApply={() => {
@@ -121,6 +121,8 @@ export default function GalleryPage() {
 														isActive={isActive}
 														textColor={isMentalWellness ? "black" : undefined}
 														onEdit={() => router.push(`/palette-edit?colors=${palette.join(",")}`)}
+														className="gallery-palette" // Add this line
+
 													/>
 												</motion.div>
 											);
