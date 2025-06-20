@@ -138,21 +138,23 @@ body {
   transform-origin: center;
 }
 
-/* Add these new styles at the end of your file */
-.gallery-palette {
-  transition: all 350ms cubic-bezier(.4,2,.6,1);
-  will-change: transform;
-}
-
-.gallery-palette:hover {
-  transform: scale(1.02);
-  box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15);
-}
-
+/* Replace the gallery-palette styles with: */
 .gallery-palette .palette-container {
-  transition: inherit;
+  transition: none !important; /* Disable container transitions */
 }
 
-.gallery-palette:hover .palette-container {
-  box-shadow: 0 15px 40px -10px rgba(0,0,0,0.2);
+.gallery-palette .palette-container .group {
+  transition: flex-grow 350ms cubic-bezier(.4,2,.6,1) !important;
+}
+
+.gallery-palette .palette-container .group:hover {
+  flex-grow: 2 !important;
+}
+
+.gallery-color-item {
+  transition: flex-grow 350ms cubic-bezier(.4,2,.6,1) !important;
+}
+
+.gallery-color-item:hover {
+  flex-grow: 2 !important;
 }

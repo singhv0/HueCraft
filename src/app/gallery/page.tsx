@@ -108,6 +108,7 @@ export default function GalleryPage() {
 													<PaletteBox 
 														colors={palette}
 														height="8rem"
+														galleryMode={true}
 														onApply={() => {
 															if (showShowcase && isActive) {
 																setShowShowcase(false);

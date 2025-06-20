@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+
 interface SortableItemProps {
   color: string;
   idx: number;
@@ -37,6 +38,7 @@ function SortableItem({
   iconColor,
   textClass,
   copiedIdx,
+  galleryMode = false, // <-- new prop for gallery mode
   handleCopy
 }: SortableItemProps) {
   const sortable = showDragHandle 
@@ -67,37 +69,26 @@ function SortableItem({
     <React.Fragment key={color + idx}>
       <div
         ref={showDragHandle ? setNodeRef : undefined}
-        className={`
-          group relative
-          transition-[flex-grow] duration-200
-          ${idx === 0 ? "rounded-l-3xl" : ""}
-          ${idx === colors.length - 1 ? "rounded-r-3xl" : ""}
-          flex-1
-        `}
-        style={{
-          flexGrow:
-            typeof pendingIdx === "number" && pendingIdx === idx
-              ? 0
-              : staticAnimation
-              ? 1
-              : hoveredIdx === idx
-              ? 2
-              : 1,
-          transition: showDragHandle && transform
-            ? (transition || "transform 350ms cubic-bezier(.22,1,.36,1)")
-            : "flex-grow 350ms cubic-bezier(.4,2,.6,1)",
-          height: "100%",
-          marginRight: 0,
-          ...(showDragHandle && transform
-            ? {
-                transform: CSS.Transform.toString(transform),
-              }
-            : {}),
-          zIndex: isDragging ? 50 : "auto",
-        }}
+  className={`
+    group relative
+    ${idx === 0 ? "rounded-l-3xl" : ""}
+    ${idx === colors.length - 1 ? "rounded-r-3xl" : ""}
+    flex-1
+    ${galleryMode ? 'gallery-color-item' : ''}
+  `}
+  style={{
+    flexGrow: hoveredIdx === idx ? 2 : 1,
+    height: "100%",
+    marginRight: 0,
+    ...(showDragHandle && transform
+      ? { transform: CSS.Transform.toString(transform) }
+      : {}),
+    zIndex: isDragging ? 50 : "auto",
+  }}
         onMouseEnter={() => setHoveredIdx(idx)}
         onMouseLeave={() => setHoveredIdx(null)}
       >
+
         {/* --- Drag Handle: Sibling, not inside button --- */}
         {showDragHandle && (
           <button
@@ -338,17 +329,18 @@ export default function PaletteBox({
 
   return (
     <div className={`relative w-full flex flex-col items-center ${galleryMode ? 'gallery-palette' : ''}`} style={{ minHeight: height }}>
-<div className="flex flex-row w-full rounded-3xl bg-gray-100 items-stretch relative palette-container" style={{ height, boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)" }}>  {colors.map((color, idx) => (
-    <MemoizedSortableItem
-      key={color + idx}
-      color={color}
-      idx={idx}
-      showDragHandle={showDragHandle}
-      pendingIdx={pendingIdx}
-      staticAnimation={staticAnimation}
-      hoveredIdx={hoveredIdx}
-      setHoveredIdx={setHoveredIdx}
-      onRemoveColor={onRemoveColor}
+      <div className="flex flex-row w-full rounded-3xl bg-gray-100 items-stretch relative palette-container" style={{ height, boxShadow: "0 0 24px 0 rgba(0,0,0,0.10)" }}>
+        {colors.map((color, idx) => (
+          <MemoizedSortableItem
+            key={color + idx}
+            color={color}
+            idx={idx}
+            showDragHandle={showDragHandle}
+            pendingIdx={pendingIdx}
+            staticAnimation={staticAnimation}
+            hoveredIdx={hoveredIdx}
+            setHoveredIdx={setHoveredIdx}
+            onRemoveColor={onRemoveColor}
       onAddColorBetween={onAddColorBetween}
       colors={colors}
       iconColor={iconColor}

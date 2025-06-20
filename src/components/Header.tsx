@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Logo3D from "./Logo3D";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Header() {
   const [hovered, setHovered] = useState(false);
@@ -12,10 +12,18 @@ export default function Header() {
   const [toolsOpen, setToolsOpen] = useState(false);
   const router = useRouter();
 
+  
+
   return (
-    <header className="w-full py-8 flex items-center justify-between relative">
-      <div className="flex items-center gap-3">
-        <Logo3D />
+    <header className="w-full py-14 pr-4 flex items-center justify-between relative">
+      <div className="flex items-center gap-6">
+        <Image
+          src="/logo (2).svg"
+          alt="HueCraft Logo"
+          width={45}
+          height={45}
+          className="flex-shrink-0"
+        />
         <Link
           href="/"
           className={`
